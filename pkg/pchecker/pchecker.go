@@ -8,12 +8,6 @@ import (
 	"unicode"
 )
 
-const (
-	space              = " "
-	firstRuneSupported = ' '
-	lastRuneSupported  = '~'
-)
-
 var (
 	defaultProfanityDetector *ProfanityDetector
 )
@@ -21,18 +15,18 @@ var (
 // ProfanityDetector contains the dictionaries as well as the configuration
 // for determining how profanity detection is handled
 type ProfanityDetector struct {
-	profanities           *SafeMap[string, bool]
-	falsePositives        *SafeMap[string, bool]
-	falseNegatives        *SafeMap[string, bool]
+	profanities           *SafeSet[string]
+	falsePositives        *SafeSet[string]
+	falseNegatives        *SafeSet[string]
 	characterReplacements map[rune]rune
 }
 
 // NewProfanityDetector creates a new ProfanityDetector
 func NewProfanityDetector() *ProfanityDetector {
 	return &ProfanityDetector{
-		profanities:           NewSafeMap(DefaultProfanities),
-		falsePositives:        NewSafeMap(DefaultFalsePositives),
-		falseNegatives:        NewSafeMap(DefaultFalseNegatives),
+		profanities:           NewSafeSet(DefaultProfanities),
+		falsePositives:        NewSafeSet(DefaultFalsePositives),
+		falseNegatives:        NewSafeSet(DefaultFalseNegatives),
 		characterReplacements: DefaultCharacterReplacements,
 	}
 }
@@ -71,8 +65,8 @@ func (g *ProfanityDetector) Censor(s string) string {
 }
 
 func (g *ProfanityDetector) checkProfanity(s *string, originalIndexes *[]int, censored *[]rune,
-	wordMap *SafeMap[string, bool], runeWordLength *int) {
-	wordMap.Range(func(word string, _ bool) {
+	wordMap *SafeSet[string], runeWordLength *int) {
+	wordMap.Range(func(word string) {
 		currentIndex := 0
 		*runeWordLength = len([]rune(word))
 		for currentIndex != -1 {
@@ -92,7 +86,7 @@ func (g *ProfanityDetector) checkProfanity(s *string, originalIndexes *[]int, ce
 }
 
 func (g *ProfanityDetector) removeFalsePositives(s *string, originalIndexes *[]int, runeWordLength *int) {
-	g.falsePositives.Range(func(word string, _ bool) {
+	g.falsePositives.Range(func(word string) {
 		currentIndex := 0
 		*runeWordLength = len([]rune(word))
 		for currentIndex != -1 {
@@ -131,7 +125,7 @@ func (g *ProfanityDetector) sanitize(s string, rememberOriginalIndexes bool) (st
 			}
 		}
 	}
-	s = strings.Replace(s, space, "", -1)
+	s = strings.Replace(s, " ", "", -1)
 	return s, originalIndexes
 }
 
@@ -141,7 +135,7 @@ func (_ *ProfanityDetector) removeAccents(s string) string {
 	removeAccentsTransformer := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	for _, character := range s {
 		// If there's a character outside the range of supported runes, there might be some accented words
-		if character < firstRuneSupported || character > lastRuneSupported {
+		if character < ' ' || character > '~' {
 			s, _, _ = transform.String(removeAccentsTransformer, s)
 			break
 		}
