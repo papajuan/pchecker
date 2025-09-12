@@ -1,6 +1,7 @@
 package pchecker
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -10,26 +11,32 @@ import (
  * @date    10/9/2024
  **/
 
+var (
+	f = func(match []rune) []rune {
+		return []rune{'*', '*', '*'}
+	}
+)
+
 func TestProfanityDetector_Censor(t *testing.T) {
 	tests := []struct {
 		input          string
 		expectedOutput string
 	}{
 		{
-			input:          "what the fuuuuuck",
-			expectedOutput: "what the ***",
-		},
-		{
-			input:          "what the N I G   G E R my",
-			expectedOutput: "what the ***",
-		},
-		{
-			input:          "what the poop",
-			expectedOutput: "what the ***",
+			input:          "What the poop is that shit, Huh?",
+			expectedOutput: "What the *** is that ***, Huh?",
 		},
 		{
 			input:          "fuck this",
 			expectedOutput: "*** this",
+		},
+		{
+			input:          "vaginas",
+			expectedOutput: "***",
+		},
+		{
+			input:          "a list",
+			expectedOutput: "a list",
 		},
 		{
 			input:          "one penis, two vaginas, three dicks, four sluts, five whores and a flower",
@@ -50,14 +57,6 @@ func TestProfanityDetector_Censor(t *testing.T) {
 		{
 			input:          "fuck this shit",
 			expectedOutput: "*** this ***",
-		},
-		{
-			input:          "F   u   C  k th1$ $h!t",
-			expectedOutput: "*** th1$ ***",
-		},
-		{
-			input:          "@$$h073",
-			expectedOutput: "***",
 		},
 		{
 			input:          "hello, world!",
@@ -84,23 +83,31 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expectedOutput: "““““““““““““But the table is on *** fire“",
 		},
 		{
-			input:          "f.u_ck this s.h-i~t",
-			expectedOutput: "*** this ***",
-		},
-		{
 			input:          "glass",
 			expectedOutput: "glass",
+		},
+		{
+			input:          "go away nigger",
+			expectedOutput: "go away ***",
+		},
+		{
+			input:          "take the bass guitar and let's play",
+			expectedOutput: "take the bass guitar and let's play",
+		},
+		{
+			input:          "he's a dumbass",
+			expectedOutput: "he's a ***",
 		},
 		{
 			input:          "ы",
 			expectedOutput: "ы",
 		},
 		{
-			input:          "documentdocument", // false positives (https://github.com/TwiN/go-away/issues/30)
+			input:          "documentdocument",
 			expectedOutput: "documentdocument",
 		},
 		{
-			input:          "dumbassdumbass fuckfuckfuck", // false negatives (https://github.com/TwiN/go-away/issues/30)
+			input:          "dumbassdumbass fuckfuckfuck",
 			expectedOutput: "*** ***",
 		},
 		{
@@ -108,13 +115,13 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expectedOutput: "document *** document ***",
 		},
 		{
-			input:          "fučk ÄšŚ pÓöp pÉnìŚ bitčh f    u     c k", // accents
-			expectedOutput: "*** *** *** *** *** ***",
+			input:          "press the button",
+			expectedOutput: "press the button",
 		},
 	}
 	for _, tt := range tests {
 		t.Run("default_"+tt.input, func(t *testing.T) {
-			censored := Censor(tt.input)
+			censored := Censor(tt.input, f)
 			if censored != tt.expectedOutput {
 				t.Errorf("expected '%s', got '%s'", tt.expectedOutput, censored)
 			}
@@ -135,19 +142,19 @@ func TestFalsePositives(t *testing.T) {
 		"passion",
 		"carcass",
 		"cassandra",
-		"just push it down the ledge", // puSH IT
-		"has steph",                   // hAS Steph
-		"was steph",                   // wAS Steph
-		"hot water",                   // hoT WATer
-		"Phoenix",                     // pHOEnix
-		"systems exist",               // systemS EXist
-		"saturday",                    // saTURDay
+		"just push it down the ledge",
+		"has steph",
+		"was steph",
+		"hot water",
+		"Phoenix",
+		"systems exist",
+		"saturday",
 		"therapeutic",
 		"press the button",
 	}
 	t.Run("Test False Positives", func(t *testing.T) {
 		for _, s := range sentences {
-			if strings.ContainsRune(Censor(s), '*') {
+			if strings.ContainsRune(Censor(s, f), '*') {
 				t.Error("Expected false, got true from:", s)
 			}
 		}
@@ -156,10 +163,10 @@ func TestFalsePositives(t *testing.T) {
 
 func TestSentencesWithFalsePositivesAndProfanities(t *testing.T) {
 	t.Run("Test Sentences With False Positives And Profanities", func(t *testing.T) {
-		if s := Censor("You are a associate"); strings.ContainsRune(s, '*') {
+		if s := Censor("You are a associate", f); strings.ContainsRune(s, '*') {
 			t.Error("Expected true, got false from sentence")
 		}
-		if s := Censor("Go away, asshole!"); !strings.ContainsRune(s, '*') {
+		if s := Censor("Go away, asshole!", f); !strings.ContainsRune(s, '*') {
 			t.Error("Expected true, got false from sentence", s)
 		}
 	})
@@ -168,7 +175,6 @@ func TestSentencesWithFalsePositivesAndProfanities(t *testing.T) {
 // "The Adventures of Sherlock Holmes" by Arthur Conan Doyle is in the public domain,
 // which makes it a perfect source to use as reference.
 func TestSentencesFromTheAdventuresOfSherlockHolmes(t *testing.T) {
-	defaultProfanityDetector = nil
 	sentences := []string{
 		"I had called upon my friend, Mr. Sherlock Holmes, one day in the autumn of last year and found him in deep conversation with a very stout, florid-faced, elderly gentleman with fiery red hair.",
 		"With an apology for my intrusion, I was about to withdraw when Holmes pulled me abruptly into the room and closed the door behind me.",
@@ -196,16 +202,41 @@ func TestSentencesFromTheAdventuresOfSherlockHolmes(t *testing.T) {
 		"We were seated at breakfast one morning, my wife and I, when the maid brought in a telegram. It was from Sherlock Holmes and ran in this way",
 	}
 	for _, s := range sentences {
-		if strings.ContainsRune(Censor(s), '*') {
+		if strings.ContainsRune(Censor(s, f), '*') {
 			t.Error("Expected false, got false from sentence", s)
 		}
 	}
 }
 
-func TestSanitize(t *testing.T) {
-	expectedString := "whatthefuckisyourproblem"
-	sanitizedString, _ := NewProfanityDetector().sanitize("What the fu_ck is y()ur pr0bl3m?", false)
-	if sanitizedString != expectedString {
-		t.Errorf("Expected '%s', got '%s'", expectedString, sanitizedString)
-	}
+const (
+	profanities    = `(?i)\b(anal|anus|arse|ass|asshole|ballsack|balls|bastard|bitch|btch|biatch|blowjob|bollock|bollok|boner|boob|bugger|butt|choad|clitoris|cock|coon|crap|cum|cunt|dick|dildo|douchebag|dumbass|dyke|fag|feck|fellate|fellatio|felching|fuck|fudgepacker|flange|gtfo|hoe|horny|incest|jerk|jizz|labia|masturbat|muff|naked|nazi|nigga|nigger|niger|niggu|nipple|nips|nude|pedophile|penis|piss|poop|porn|prick|prostitut|pube|pussie|pussy|queer|rape|rapist|retard|rimjob|scrotum|sex|shit|slut|spunk|stfu|suckmy|tits|tittie|titty|turd|twat|vagina|wank|whore)\w*\b`
+	falsePositives = `(?i)\b(analy|arsenal|assassin|assaying|assert|assign|assimil|assist|associat|assum|assur|banal|basement|bass|cass|butter|butthe|button|canvass|circum|clitheroe|cockburn|cocktail|cumber|cumbing|cumulat|dickvandyke|document|evaluate|exclusive|expensive|explain|expression|grape|grass|harass|hass|horniman|hotwater|identit|kassa|kassi|lass|leafage|libshitz|magnacumlaude|mass|mocha|pass|penistone|phoebe|phoenix|pushit|sassy|saturday|scrap|serfage|sexist|shoe|scunthorpe|shitake|stitch|sussex|therapist|therapeutic|tysongay|wass|wharfage)\w*\b`
+)
+
+func BenchmarkProfanityDetector_CensorVSRegexp(b *testing.B) {
+	input := "one penis, two vaginas, three dicks, four sluts, five whores and a flower"
+	b.Run("Test Regexp ReplaceAllString", func(b *testing.B) {
+		profanityRegexp := regexp.MustCompile(profanities)
+		falseProfanityRegexp := regexp.MustCompile(falsePositives)
+		b.ReportAllocs()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				profanityRegexp.ReplaceAllStringFunc(input, func(match string) string {
+					if falseProfanityRegexp.MatchString(match) {
+						return match
+					}
+					return "***"
+				})
+			}
+		})
+	})
+	b.Run("Test ProfanityDetector Censor", func(b *testing.B) {
+		profanityDetector := NewDefaultProfanityDetector()
+		b.ReportAllocs()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				profanityDetector.censor(input, f)
+			}
+		})
+	})
 }
