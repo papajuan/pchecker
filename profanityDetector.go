@@ -1,10 +1,11 @@
 package pchecker
 
 import (
-	"pchecker/ds"
 	"sync"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/papajuan/pchecker/ds"
 )
 
 /**
