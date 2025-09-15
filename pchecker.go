@@ -1,8 +1,6 @@
 package pchecker
 
-import (
-	"pchecker/ds"
-)
+import "github.com/papajuan/pchecker/ds"
 
 var (
 	pd *ProfanityDetector
