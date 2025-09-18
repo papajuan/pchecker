@@ -27,24 +27,22 @@ func newTokenBuffer(resultLen int, f ReplacementFunc) *tokenBuffer {
 	return result
 }
 
-func (tb *tokenBuffer) close() {
-	tb.buffPool.Put(tb.buff[:0])
-}
-
 func (tb *tokenBuffer) flush(falsePositives *SafeTrie[rune]) {
-	if len(tb.buff) == 0 {
-		return
+	if len(tb.buff) > 0 {
+		if tb.badToken && !falsePositives.IsPrefixInTrie(tb.buff) {
+			tb.result = append(tb.result, tb.f(tb.buff)...)
+		} else {
+			tb.result = append(tb.result, tb.buff...)
+		}
+		tb.buff = tb.buff[:0]
+		tb.badToken = false
 	}
-	isFalsePositive := falsePositives.IsPrefixInTrie(tb.buff)
-	if tb.badToken && !isFalsePositive {
-		tb.result = append(tb.result, tb.f(tb.buff)...)
-	} else {
-		tb.result = append(tb.result, tb.buff...)
-	}
-	tb.buff = tb.buff[:0]
-	tb.badToken = false
 }
 
 func (tb *tokenBuffer) String() string {
 	return string(tb.result)
+}
+
+func (tb *tokenBuffer) close() {
+	tb.buffPool.Put(tb.buff[:0])
 }

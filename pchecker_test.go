@@ -12,8 +12,10 @@ import (
  **/
 
 var (
-	f = func(match []rune) []rune {
-		return []rune{'*', '*', '*'}
+	replacementStr = "***"
+	replacement    = []rune(replacementStr)
+	f              = func(match []rune) []rune {
+		return replacement
 	}
 )
 
@@ -233,7 +235,7 @@ func BenchmarkProfanityDetector_CensorVSRegexp(b *testing.B) {
 					if falseProfanityRegexp.MatchString(match) {
 						return match
 					}
-					return "***"
+					return replacementStr
 				})
 			}
 		})

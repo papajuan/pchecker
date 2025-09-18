@@ -75,21 +75,38 @@ func (pd *ProfanityDetector) WithDefaultCharacterReplacements() *ProfanityDetect
 func (pd *ProfanityDetector) censor(input string, f ReplacementFunc) string {
 	tb := newTokenBuffer(utf8.RuneCountInString(input), f)
 	defer tb.close()
+	var curr *node[rune] = nil // rolling pointer in the profanities trie
 	for _, r := range input {
 		if unicode.IsPunct(r) || unicode.IsSpace(r) {
 			tb.flush(pd.falsePositives)
 			tb.result = append(tb.result, r)
+			curr = nil // reset trie state on delimiter
+			continue
+		}
+		normRune := pd.getCharReplacement(r)
+		tb.buff = append(tb.buff, normRune)
+		// Advance the trie
+		if curr == nil {
+			curr = pd.profanities.root
+		}
+		if next, ok := curr.children[normRune]; ok {
+			curr = next
+			if curr.isEnd {
+				tb.badToken = true
+			}
 		} else {
-			tb.buff = append(tb.buff, pd.getCharReplacement(r))
-			for i := 0; i < len(tb.buff); i++ {
-				_, isWord := pd.profanities.StartsWith(tb.buff[i:])
-				if isWord {
+			// Dead end: restart from root using this rune
+			if next, ok = pd.profanities.root.children[normRune]; ok {
+				curr = next
+				if curr.isEnd {
 					tb.badToken = true
-					break
 				}
+			} else {
+				curr = nil
 			}
 		}
 	}
+	// flush the last token
 	tb.flush(pd.falsePositives)
 	return tb.String()
 }
