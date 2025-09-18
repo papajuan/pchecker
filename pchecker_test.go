@@ -27,6 +27,10 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expectedOutput: "What the *** is that ***, Huh?",
 		},
 		{
+			input:          "getfuck out",
+			expectedOutput: "*** out",
+		},
+		{
 			input:          "fuck this",
 			expectedOutput: "*** this",
 		},
@@ -83,8 +87,12 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expectedOutput: "““““““““““““But the table is on *** fire“",
 		},
 		{
-			input:          "glass",
-			expectedOutput: "glass",
+			input:          "glasses",
+			expectedOutput: "glasses",
+		},
+		{
+			input:          "asses",
+			expectedOutput: "***",
 		},
 		{
 			input:          "go away nigger",

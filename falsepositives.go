@@ -37,6 +37,7 @@ var DefaultFalsePositives = map[string]bool{
 	"expression":    true,
 	"grape":         true,
 	"grass":         true,
+	"glass":         true,
 	"harass":        true,
 	"hass":          true,
 	"horniman":      true,

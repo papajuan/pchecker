@@ -1,15 +1,13 @@
 package pchecker
 
-import "github.com/papajuan/pchecker/ds"
-
 var (
 	pd *ProfanityDetector
 )
 
-type ProfanityReplacementFunc func(match []rune) []rune
+type ReplacementFunc func(match []rune) []rune
 
-func getSafeTrie(m map[string]bool) *ds.SafeTrie[rune] {
-	result := ds.NewSafeTrie[rune](len(m))
+func getSafeTrie(m map[string]bool) *SafeTrie[rune] {
+	result := NewSafeTrie[rune](len(m))
 	for word := range m {
 		result.Insert([]rune(word))
 	}
@@ -19,7 +17,7 @@ func getSafeTrie(m map[string]bool) *ds.SafeTrie[rune] {
 // Censor takes in a string (word or sentence) and tries to censor all profanities found.
 //
 // Uses the default ProfanityDetector
-func Censor(s string, f ProfanityReplacementFunc) string {
+func Censor(s string, f ReplacementFunc) string {
 	if pd == nil {
 		pd = NewDefaultProfanityDetector()
 	}

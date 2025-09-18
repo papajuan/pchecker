@@ -1,6 +1,8 @@
-package ds
+package pchecker
 
-import "sync"
+import (
+	"sync"
+)
 
 /**
  * @author  papajuan
@@ -9,8 +11,9 @@ import "sync"
 
 // SafeTrie represents the concurrently safe prefix tree
 type SafeTrie[K comparable] struct {
-	root *node[K]
-	lock sync.RWMutex
+	root       *node[K]
+	lock       sync.RWMutex
+	comparator func(K) K
 }
 
 // node represents a node in the Trie
@@ -25,6 +28,11 @@ func NewSafeTrie[K comparable](length int) *SafeTrie[K] {
 			children: make(map[K]*node[K], length),
 		},
 	}
+}
+
+func (t *SafeTrie[K]) WithComparator(f func(K) K) *SafeTrie[K] {
+	t.comparator = f
+	return t
 }
 
 // Insert adds a word to the Trie
@@ -49,11 +57,14 @@ func (t *SafeTrie[K]) Exists(arr []K) bool {
 	t.lock.RLock()
 	defer t.lock.RUnlock()
 	n := t.root
-	for _, symbol := range arr {
-		if _, exists := n.children[symbol]; !exists {
+	for _, ch := range arr {
+		if t.comparator != nil {
+			ch = t.comparator(ch)
+		}
+		if _, exists := n.children[ch]; !exists {
 			return false
 		}
-		n = n.children[symbol]
+		n = n.children[ch]
 	}
 	return n.isEnd
 }
@@ -64,6 +75,9 @@ func (t *SafeTrie[K]) StartsWith(arr []K) (bool, bool) {
 	defer t.lock.RUnlock()
 	n := t.root
 	for _, ch := range arr {
+		if t.comparator != nil {
+			ch = t.comparator(ch)
+		}
 		// If the character doesn't exist, return false
 		if _, exists := n.children[ch]; !exists {
 			return false, false
@@ -78,6 +92,9 @@ func (t *SafeTrie[K]) IsPrefixInTrie(arr []K) bool {
 	defer t.lock.RUnlock()
 	n := t.root
 	for _, ch := range arr {
+		if t.comparator != nil {
+			ch = t.comparator(ch)
+		}
 		if _, exists := n.children[ch]; !exists {
 			break
 		}
