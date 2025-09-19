@@ -21,119 +21,123 @@ var (
 
 func TestProfanityDetector_Censor(t *testing.T) {
 	tests := []struct {
-		input          string
-		expectedOutput string
+		input    string
+		expected string
 	}{
 		{
-			input:          "What the poop is that shit, Huh?",
-			expectedOutput: "What the *** is that ***, Huh?",
+			input:    "What the poop is that shit, Huh?",
+			expected: "What the *** is that ***, Huh?",
 		},
 		{
-			input:          "getfuck out",
-			expectedOutput: "*** out",
+			input:    "getfuck out",
+			expected: "*** out",
 		},
 		{
-			input:          "fuck this",
-			expectedOutput: "*** this",
+			input:    "fuck this",
+			expected: "*** this",
 		},
 		{
-			input:          "vaginas",
-			expectedOutput: "***",
+			input:    "vaginas",
+			expected: "***",
 		},
 		{
-			input:          "a list",
-			expectedOutput: "a list",
+			input:    "a list",
+			expected: "a list",
 		},
 		{
-			input:          "one penis, two vaginas, three dicks, four sluts, five whores and a flower",
-			expectedOutput: "one ***, two ***, three ***, four ***, five *** and a flower",
+			input:    "one penis, two vaginas, three dicks, four sluts, five whores and a flower",
+			expected: "one ***, two ***, three ***, four ***, five *** and a flower",
 		},
 		{
-			input:          "Censor doesn't support sanitizing '()' into 'o', because it's two characters. Proof: c()ck. Maybe one day I'll have time to fix it.",
-			expectedOutput: "Censor doesn't support sanitizing '()' into 'o', because it's two characters. Proof: c()ck. Maybe one day I'll have time to fix it.",
+			input:    "Censor doesn't support sanitizing '()' into 'o', because it's two characters. Proof: c()ck. Maybe one day I'll have time to fix it.",
+			expected: "Censor doesn't support sanitizing '()' into 'o', because it's two characters. Proof: c()ck. Maybe one day I'll have time to fix it.",
 		},
 		{
-			input:          "fuck shit fuck",
-			expectedOutput: "*** *** ***",
+			input:    "fuck shit fuck",
+			expected: "*** *** ***",
 		},
 		{
-			input:          "fuckfuck",
-			expectedOutput: "***",
+			input:    "fuckfuck",
+			expected: "***",
 		},
 		{
-			input:          "fuck this shit",
-			expectedOutput: "*** this ***",
+			input:    "fuck this shit",
+			expected: "*** this ***",
 		},
 		{
-			input:          "hello, world!",
-			expectedOutput: "hello, world!",
+			input:    "hello, world!",
+			expected: "hello, world!",
 		},
 		{
-			input:          "Hey asshole, are y()u an assassin? If not, fuck off.",
-			expectedOutput: "Hey ***, are y()u an assassin? If not, *** off.",
+			input:    "Hey asshole, are y()u an assassin? If not, fuck off.",
+			expected: "Hey ***, are y()u an assassin? If not, *** off.",
 		},
 		{
-			input:          "I am from Scunthorpe, north Lincolnshire",
-			expectedOutput: "I am from Scunthorpe, north Lincolnshire",
+			input:    "I am from Scunthorpe, north Lincolnshire",
+			expected: "I am from Scunthorpe, north Lincolnshire",
 		},
 		{
-			input:          "He is an associate of mine",
-			expectedOutput: "He is an associate of mine",
+			input:    "He is an associate of mine",
+			expected: "He is an associate of mine",
 		},
 		{
-			input:          "But the table is on fucking fire",
-			expectedOutput: "But the table is on *** fire",
+			input:    "But the table is on fucking fire",
+			expected: "But the table is on *** fire",
 		},
 		{
-			input:          "““““““““““““But the table is on fucking fire“",
-			expectedOutput: "““““““““““““But the table is on *** fire“",
+			input:    "““““““““““““But the table is on fucking fire“",
+			expected: "““““““““““““But the table is on *** fire“",
 		},
 		{
-			input:          "glasses",
-			expectedOutput: "glasses",
+			input:    "glasses",
+			expected: "glasses",
 		},
 		{
-			input:          "asses",
-			expectedOutput: "***",
+			input:    "asses",
+			expected: "***",
 		},
 		{
-			input:          "go away nigger",
-			expectedOutput: "go away ***",
+			input:    "go away nigger",
+			expected: "go away ***",
 		},
 		{
-			input:          "take the bass guitar and let's play",
-			expectedOutput: "take the bass guitar and let's play",
+			input:    "take the bass guitar and let's play",
+			expected: "take the bass guitar and let's play",
 		},
 		{
-			input:          "he's a dumbass",
-			expectedOutput: "he's a ***",
+			input:    "he's a dumbass",
+			expected: "he's a ***",
 		},
 		{
-			input:          "ы",
-			expectedOutput: "ы",
+			input:    "ы",
+			expected: "ы",
 		},
 		{
-			input:          "documentdocument",
-			expectedOutput: "documentdocument",
+			input:    "documentdocument",
+			expected: "documentdocument",
 		},
 		{
-			input:          "dumbassdumbass fuckfuckfuck",
-			expectedOutput: "*** ***",
+			input:    "Fucking fUck",
+			expected: "*** ***",
 		},
 		{
-			input:          "document fuck document fuck",
-			expectedOutput: "document *** document ***",
+			input:    "dumbassdumbass fuckfuckfuck",
+			expected: "*** ***",
 		},
 		{
-			input:          "press the button",
-			expectedOutput: "press the button",
+			input:    "document fuck document fuck",
+			expected: "document *** document ***",
+		},
+		{
+			input:    "press the button",
+			expected: "press the button",
 		},
 	}
 	for _, tt := range tests {
 		t.Run("default_"+tt.input, func(t *testing.T) {
 			censored := Censor(tt.input, f)
-			if censored != tt.expectedOutput {
-				t.Errorf("expected '%s', got '%s'", tt.expectedOutput, censored)
+			if censored != tt.expected {
+				t.Errorf("expected '%s', got '%s'", tt.expected, censored)
 			}
 		})
 	}

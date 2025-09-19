@@ -89,14 +89,14 @@ func (pd *ProfanityDetector) censor(input string, f ReplacementFunc) string {
 		if curr == nil {
 			curr = pd.profanities.root
 		}
-		if next, ok := curr.children[normRune]; ok {
+		if next, ok := curr.children[unicode.ToLower(normRune)]; ok {
 			curr = next
 			if curr.isEnd {
 				tb.badToken = true
 			}
 		} else {
 			// Dead end: restart from root using this rune
-			if next, ok = pd.profanities.root.children[normRune]; ok {
+			if next, ok = pd.profanities.root.children[unicode.ToLower(normRune)]; ok {
 				curr = next
 				if curr.isEnd {
 					tb.badToken = true
