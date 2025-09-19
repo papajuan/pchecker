@@ -38,8 +38,8 @@ func main() {
 	pd := pchecker.NewDefaultProfanityDetector()
 
 	// Define replacement function
-	f := func(match []rune) []rune {
-		return []rune{'*', '*', '*'}
+	f := func(match []rune) string {
+		return "***"
 	}
 
 	// Censor input
@@ -50,10 +50,13 @@ func main() {
 
 
 Expected performance:
+- ~2-3 µs per operation for average sentences
+- Minimal memory allocations (~6 allocs per operation)
 
-- ~5–6 µs per operation for average sentences
+Comparing to regexp:
 
-- Minimal memory allocations (~8 allocs per operation)
+- ~8-9 µs per operation for average sentences (the more bad words dictionary the worse performance)
+- Minimal memory allocations (~6 allocs per operation)
 
 Contributing
 
