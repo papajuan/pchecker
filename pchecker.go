@@ -4,7 +4,7 @@ var (
 	pd *ProfanityDetector
 )
 
-type ReplacementFunc func(match []rune) []rune
+type ReplacementFunc func(match []rune) string
 
 func getSafeTrie(m map[string]bool) *SafeTrie[rune] {
 	result := NewSafeTrie[rune](len(m))

@@ -79,8 +79,8 @@ func (pd *ProfanityDetector) censor(input string, f ReplacementFunc) string {
 	for _, r := range input {
 		if unicode.IsPunct(r) || unicode.IsSpace(r) {
 			tb.flush(pd.falsePositives)
-			tb.result = append(tb.result, r)
-			curr = nil // reset trie state on delimiter
+			tb.result.WriteRune(r)
+			curr = nil
 			continue
 		}
 		normRune := pd.getCharReplacement(r)

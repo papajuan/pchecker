@@ -13,9 +13,9 @@ import (
 
 var (
 	replacementStr = "***"
-	replacement    = []rune(replacementStr)
-	f              = func(match []rune) []rune {
-		return replacement
+	replacement    = []byte(replacementStr)
+	f              = func(match []rune) string {
+		return replacementStr
 	}
 )
 
@@ -223,11 +223,14 @@ const (
 	falsePositives = `(?i)\b(analy|arsenal|assassin|assaying|assert|assign|assimil|assist|associat|assum|assur|banal|basement|bass|cass|butter|butthe|button|canvass|circum|clitheroe|cockburn|cocktail|cumber|cumbing|cumulat|dickvandyke|document|evaluate|exclusive|expensive|explain|expression|grape|grass|harass|hass|horniman|hotwater|identit|kassa|kassi|lass|leafage|libshitz|magnacumlaude|mass|mocha|pass|penistone|phoebe|phoenix|pushit|sassy|saturday|scrap|serfage|sexist|shoe|scunthorpe|shitake|stitch|sussex|therapist|therapeutic|tysongay|wass|wharfage)\w*\b`
 )
 
+var (
+	profanityRegexp      = regexp.MustCompile(profanities)
+	falseProfanityRegexp = regexp.MustCompile(falsePositives)
+)
+
 func BenchmarkProfanityDetector_CensorVSRegexp(b *testing.B) {
 	input := "one penis, two vaginas, three dicks, four sluts, five whores and a flower"
 	b.Run("Test Regexp ReplaceAllString", func(b *testing.B) {
-		profanityRegexp := regexp.MustCompile(profanities)
-		falseProfanityRegexp := regexp.MustCompile(falsePositives)
 		b.ReportAllocs()
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {

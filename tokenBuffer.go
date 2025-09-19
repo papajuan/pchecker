@@ -1,6 +1,7 @@
 package pchecker
 
 import (
+	"strings"
 	"sync"
 )
 
@@ -13,16 +14,16 @@ type tokenBuffer struct {
 	buffPool sync.Pool
 	buff     []rune
 	badToken bool
-	result   []rune
+	result   strings.Builder
 	f        ReplacementFunc
 }
 
 func newTokenBuffer(resultLen int, f ReplacementFunc) *tokenBuffer {
 	result := &tokenBuffer{
-		result: make([]rune, 0, resultLen),
-		f:      f,
+		f: f,
 	}
-	result.buffPool = sync.Pool{New: func() any { return make([]rune, 0, 32) }}
+	result.result.Grow(resultLen)
+	result.buffPool = sync.Pool{New: func() any { return make([]rune, 0, 16) }}
 	result.buff = result.buffPool.Get().([]rune)[:0]
 	return result
 }
@@ -30,9 +31,11 @@ func newTokenBuffer(resultLen int, f ReplacementFunc) *tokenBuffer {
 func (tb *tokenBuffer) flush(falsePositives *SafeTrie[rune]) {
 	if len(tb.buff) > 0 {
 		if tb.badToken && !falsePositives.IsPrefixInTrie(tb.buff) {
-			tb.result = append(tb.result, tb.f(tb.buff)...)
+			tb.result.WriteString(tb.f(tb.buff))
 		} else {
-			tb.result = append(tb.result, tb.buff...)
+			for _, r := range tb.buff {
+				tb.result.WriteRune(r)
+			}
 		}
 		tb.buff = tb.buff[:0]
 		tb.badToken = false
@@ -40,7 +43,7 @@ func (tb *tokenBuffer) flush(falsePositives *SafeTrie[rune]) {
 }
 
 func (tb *tokenBuffer) String() string {
-	return string(tb.result)
+	return tb.result.String()
 }
 
 func (tb *tokenBuffer) close() {
