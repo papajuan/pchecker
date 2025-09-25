@@ -84,8 +84,7 @@ func (pd *ProfanityDetector) censor(input string, f ReplacementFunc) string {
 			continue
 		}
 		normRune := pd.getCharReplacement(r)
-		tb.buff = append(tb.buff, normRune)
-		// Advance the trie
+		tb.buff = append(tb.buff, r)
 		if curr == nil {
 			curr = pd.profanities.root
 		}

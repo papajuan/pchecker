@@ -33,6 +33,10 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expected: "*** out",
 		},
 		{
+			input:    "sh1t",
+			expected: "***",
+		},
+		{
 			input:    "fuck this",
 			expected: "*** this",
 		},
@@ -95,6 +99,10 @@ func TestProfanityDetector_Censor(t *testing.T) {
 		{
 			input:    "asses",
 			expected: "***",
+		},
+		{
+			input:    "as 1 of all",
+			expected: "as 1 of all",
 		},
 		{
 			input:    "go away nigger",
