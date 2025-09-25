@@ -1,6 +1,7 @@
 package pchecker
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -14,6 +15,7 @@ type SafeTrie[K comparable] struct {
 	root       *node[K]
 	lock       sync.RWMutex
 	comparator func(K) K
+	strFunc    func([]K) string
 }
 
 // node represents a node in the Trie
@@ -28,6 +30,11 @@ func NewSafeTrie[K comparable](length int) *SafeTrie[K] {
 			children: make(map[K]*node[K], length),
 		},
 	}
+}
+
+func (t *SafeTrie[K]) WithStrFunc(f func([]K) string) *SafeTrie[K] {
+	t.strFunc = f
+	return t
 }
 
 func (t *SafeTrie[K]) WithComparator(f func(K) K) *SafeTrie[K] {
@@ -101,4 +108,22 @@ func (t *SafeTrie[K]) IsPrefixInTrie(arr []K) bool {
 		n = n.children[ch]
 	}
 	return n.children == nil || len(n.children) == 0
+}
+
+func (t *SafeTrie[K]) PrintAll() {
+	if t.strFunc == nil {
+		panic("string function is not set")
+	}
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+	var dfs func(n *node[K], prefix []K)
+	dfs = func(n *node[K], prefix []K) {
+		if n.isEnd {
+			fmt.Println(t.strFunc(prefix))
+		}
+		for r, child := range n.children {
+			dfs(child, append(prefix, r))
+		}
+	}
+	dfs(t.root, nil)
 }

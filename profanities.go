@@ -4,6 +4,7 @@ package pchecker
 //
 // Note that some words that would normally be in this list may be in DefaultFalseNegatives
 var DefaultProfanities = map[string]bool{
+	"2girlsicup":  true,
 	"anal":        true,
 	"anus":        true,
 	"arse":        true,

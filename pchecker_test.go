@@ -61,6 +61,10 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expected: "*** *** ***",
 		},
 		{
+			input:    "2girls1cup",
+			expected: "***",
+		},
+		{
 			input:    "fuckfuck",
 			expected: "***",
 		},
@@ -263,5 +267,13 @@ func BenchmarkProfanityDetector_CensorVSRegexp(b *testing.B) {
 				profanityDetector.censor(input, f)
 			}
 		})
+	})
+}
+
+func TestPrintAll(t *testing.T) {
+	t.Run("Test PrintAll", func(t *testing.T) {
+		NewDefaultProfanityDetector().Profanities().WithStrFunc(func(arr []rune) string {
+			return string(arr)
+		}).PrintAll()
 	})
 }

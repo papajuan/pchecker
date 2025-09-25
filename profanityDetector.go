@@ -37,6 +37,10 @@ func (pd *ProfanityDetector) WithProfanities(profanities map[string]bool) *Profa
 	return pd
 }
 
+func (pd *ProfanityDetector) Profanities() *SafeTrie[rune] {
+	return pd.profanities
+}
+
 func (pd *ProfanityDetector) WithDefaultProfanities() *ProfanityDetector {
 	pd.profanities = getSafeTrie(DefaultProfanities).WithComparator(unicode.ToLower)
 	return pd
