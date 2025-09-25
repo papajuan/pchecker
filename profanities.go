@@ -43,6 +43,7 @@ var DefaultProfanities = map[string]bool{
 	"fuck":        true,
 	"fudgepacker": true,
 	"flange":      true,
+	"gay":         true,
 	"gtfo":        true,
 	"hoe":         true, // while that's also a tool, I doubt somebody would be checking for profanities if that tool was relevant
 	"horny":       true,

@@ -133,6 +133,10 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expected: "*** ***",
 		},
 		{
+			input:    "he is a g@y",
+			expected: "he is a ***",
+		},
+		{
 			input:    "dumbassdumbass fuckfuckfuck",
 			expected: "*** ***",
 		},
