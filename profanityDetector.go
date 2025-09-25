@@ -76,7 +76,7 @@ func (pd *ProfanityDetector) WithDefaultCharacterReplacements() *ProfanityDetect
 	return pd
 }
 
-func (pd *ProfanityDetector) censor(input string, f ReplacementFunc) string {
+func (pd *ProfanityDetector) Censor(input string, f ReplacementFunc) string {
 	tb := newTokenBuffer(utf8.RuneCountInString(input), f)
 	defer tb.close()
 	var curr *node[rune] = nil // rolling pointer in the profanities trie

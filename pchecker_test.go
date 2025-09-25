@@ -145,9 +145,10 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expected: "press the button",
 		},
 	}
+	pd := NewDefaultProfanityDetector()
 	for _, tt := range tests {
 		t.Run("default_"+tt.input, func(t *testing.T) {
-			censored := Censor(tt.input, f)
+			censored := pd.Censor(tt.input, f)
 			if censored != tt.expected {
 				t.Errorf("expected '%s', got '%s'", tt.expected, censored)
 			}
@@ -178,9 +179,10 @@ func TestFalsePositives(t *testing.T) {
 		"therapeutic",
 		"press the button",
 	}
+	pd := NewDefaultProfanityDetector()
 	t.Run("Test False Positives", func(t *testing.T) {
 		for _, s := range sentences {
-			if strings.ContainsRune(Censor(s, f), '*') {
+			if strings.ContainsRune(pd.Censor(s, f), '*') {
 				t.Error("Expected false, got true from:", s)
 			}
 		}
@@ -188,11 +190,12 @@ func TestFalsePositives(t *testing.T) {
 }
 
 func TestSentencesWithFalsePositivesAndProfanities(t *testing.T) {
+	pd := NewDefaultProfanityDetector()
 	t.Run("Test Sentences With False Positives And Profanities", func(t *testing.T) {
-		if s := Censor("You are a associate", f); strings.ContainsRune(s, '*') {
+		if s := pd.Censor("You are a associate", f); strings.ContainsRune(s, '*') {
 			t.Error("Expected true, got false from sentence")
 		}
-		if s := Censor("Go away, asshole!", f); !strings.ContainsRune(s, '*') {
+		if s := pd.Censor("Go away, asshole!", f); !strings.ContainsRune(s, '*') {
 			t.Error("Expected true, got false from sentence", s)
 		}
 	})
@@ -227,8 +230,9 @@ func TestSentencesFromTheAdventuresOfSherlockHolmes(t *testing.T) {
 		"Within there was a small corridor, which ended in a very massive iron gate.",
 		"We were seated at breakfast one morning, my wife and I, when the maid brought in a telegram. It was from Sherlock Holmes and ran in this way",
 	}
+	pd := NewDefaultProfanityDetector()
 	for _, s := range sentences {
-		if strings.ContainsRune(Censor(s, f), '*') {
+		if strings.ContainsRune(pd.Censor(s, f), '*') {
 			t.Error("Expected false, got false from sentence", s)
 		}
 	}
@@ -264,7 +268,7 @@ func BenchmarkProfanityDetector_CensorVSRegexp(b *testing.B) {
 		b.ReportAllocs()
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
-				profanityDetector.censor(input, f)
+				profanityDetector.Censor(input, f)
 			}
 		})
 	})
