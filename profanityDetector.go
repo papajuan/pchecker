@@ -81,7 +81,7 @@ func (pd *ProfanityDetector) Censor(input string, f ReplacementFunc) string {
 	defer tb.close()
 	var curr *node[rune] = nil // rolling pointer in the profanities trie
 	for _, r := range input {
-		if (r != '@' && unicode.IsPunct(r)) || unicode.IsSpace(r) {
+		if (r != '@' && r != '_' && unicode.IsPunct(r)) || unicode.IsSpace(r) {
 			tb.flush(pd.falsePositives)
 			tb.result.WriteRune(r)
 			curr = nil
