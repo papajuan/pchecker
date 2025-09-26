@@ -61,6 +61,10 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expected: "*** *** ***",
 		},
 		{
+			input:    "massterbait",
+			expected: "***",
+		},
+		{
 			input:    "2girls1cup",
 			expected: "***",
 		},
@@ -254,6 +258,15 @@ var (
 
 func BenchmarkProfanityDetector_CensorVSRegexp(b *testing.B) {
 	input := "one penis, two vaginas, three dicks, four sluts, five whores and a flower"
+	profanityDetector := NewDefaultProfanityDetector()
+	b.Run("Test ProfanityDetector Censor", func(b *testing.B) {
+		b.ReportAllocs()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				profanityDetector.Censor(input, f)
+			}
+		})
+	})
 	b.Run("Test Regexp ReplaceAllString", func(b *testing.B) {
 		b.ReportAllocs()
 		b.RunParallel(func(pb *testing.PB) {
@@ -264,15 +277,6 @@ func BenchmarkProfanityDetector_CensorVSRegexp(b *testing.B) {
 					}
 					return replacementStr
 				})
-			}
-		})
-	})
-	b.Run("Test ProfanityDetector Censor", func(b *testing.B) {
-		profanityDetector := NewDefaultProfanityDetector()
-		b.ReportAllocs()
-		b.RunParallel(func(pb *testing.PB) {
-			for pb.Next() {
-				profanityDetector.Censor(input, f)
 			}
 		})
 	})

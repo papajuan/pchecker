@@ -6,7 +6,5 @@ package pchecker
  **/
 
 var DefaultFalseNegatives = map[string]bool{
-	"asshole": true,
-	"dumbass": true, // ass -> bASS (FP) -> dumBASS
-	"nigger":  true,
+	"masst": true,
 }

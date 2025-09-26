@@ -52,6 +52,7 @@ var DefaultProfanities = map[string]bool{
 	"jizz":        true,
 	"labia":       true,
 	"masturbat":   true,
+	"massterbait": true,
 	"muff":        true,
 	"naked":       true,
 	"nazi":        true,

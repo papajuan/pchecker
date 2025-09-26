@@ -28,9 +28,9 @@ func newTokenBuffer(resultLen int, f ReplacementFunc) *tokenBuffer {
 	return result
 }
 
-func (tb *tokenBuffer) flush(falsePositives *SafeTrie[rune]) {
+func (tb *tokenBuffer) flush(falsePositives, falseNegatives *SafeTrie[rune]) {
 	if len(tb.buff) > 0 {
-		if tb.badToken && !falsePositives.IsPrefixInTrie(tb.buff) {
+		if tb.badToken && (!falsePositives.IsPrefixInTrie(tb.buff) || falseNegatives.IsPrefixInTrie(tb.buff)) {
 			tb.result.WriteString(tb.f(tb.buff))
 		} else {
 			for _, r := range tb.buff {
