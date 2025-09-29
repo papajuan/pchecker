@@ -4,6 +4,10 @@ package pchecker
 //
 // Note that some words that would normally be in this list may be in DefaultFalseNegatives
 var DefaultProfanities = map[string]bool{
+	"abbo":        true,
+	"abortion":    true,
+	"abuse":       true,
+	"abusive":     true,
 	"mideast":     true,
 	"yeasty":      true,
 	"bigblack":    true,
@@ -13,6 +17,7 @@ var DefaultProfanities = map[string]bool{
 	"arse":        true,
 	"ass":         true,
 	"asshole":     true,
+	"babies":      true,
 	"ballsack":    true,
 	"balls":       true,
 	"bastard":     true,

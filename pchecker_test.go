@@ -29,6 +29,10 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expected: "What the *** is that ***, Huh?",
 		},
 		{
+			input:    "sumof abiatch",
+			expected: "sumof ***",
+		},
+		{
 			input:    "bigbreasts",
 			expected: "***",
 		},
