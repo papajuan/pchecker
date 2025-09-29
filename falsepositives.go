@@ -18,7 +18,6 @@ var DefaultFalsePositives = map[string]bool{
 	"bass":          true,
 	"cass":          true, // cassie, cassandra, carcass
 	"butter":        true, // butter, butterfly
-	"butthe":        true,
 	"button":        true,
 	"canvass":       true,
 	"circum":        true,

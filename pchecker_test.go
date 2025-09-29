@@ -29,11 +29,23 @@ func TestProfanityDetector_Censor(t *testing.T) {
 			expected: "What the *** is that ***, Huh?",
 		},
 		{
+			input:    "bigbreasts",
+			expected: "***",
+		},
+		{
 			input:    "getfuck out",
 			expected: "*** out",
 		},
 		{
+			input:    "momfuck",
+			expected: "***",
+		},
+		{
 			input:    "sh1t",
+			expected: "***",
+		},
+		{
+			input:    "butthead",
 			expected: "***",
 		},
 		{
